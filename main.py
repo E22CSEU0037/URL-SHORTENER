@@ -1,69 +1,65 @@
-from flask import Flask, request, jsonify, redirect, render_template
-from flask_pymongo import PyMongo
-from datetime import datetime, timedelta
-import shortuuid
+from flask import Flask, request, redirect, render_template, jsonify
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import string, random, datetime, os
 
-# Initialize Flask app
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-mongo = PyMongo(app)
+# Flask app setup
+app = Flask(__name__, template_folder=os.path.join('app', 'templates'))
 
-# Home page (URL input form)
-@app.route('/')
+# MongoDB setup
+client = MongoClient("mongodb://localhost:27017/")  # Update if you're using Atlas or Render
+db = client["url_shortener"]
+collection = db["urls"]
+
+# Utility: generate short ID
+def generate_short_id(num_chars=6):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=num_chars))
+
+# Home page with form
+@app.route("/", methods=["GET"])
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-# API to shorten URL
-@app.route('/shorten', methods=['POST'])
+# Create shortened URL
+@app.route("/shorten", methods=["POST"])
 def shorten_url():
-    original_url = request.form.get('original_url')
-    expiry_days = int(request.form.get('expiry_days', 30))
-    short_code = shortuuid.uuid()[:6]
-    now = datetime.utcnow()
+    original_url = request.form["original_url"]
+    short_id = generate_short_id()
 
-    mongo.db.urls.insert_one({
+    while collection.find_one({"short_id": short_id}):
+        short_id = generate_short_id()
+
+    data = {
         "original_url": original_url,
-        "short_code": short_code,
-        "clicks": 0,
-        "created_at": now,
-        "expiry_date": now + timedelta(days=expiry_days)
-    })
+        "short_id": short_id,
+        "created_at": datetime.datetime.utcnow(),
+        "clicks": 0
+    }
+    collection.insert_one(data)
 
-    return render_template('result.html', short_url=request.host_url + short_code)
+    short_url = request.host_url + short_id
+    return render_template("index.html", short_url=short_url)
 
-# Redirect short URL
-@app.route('/<short_code>')
-def redirect_short_url(short_code):
-    url_data = mongo.db.urls.find_one({"short_code": short_code})
-
-    if url_data:
-        if datetime.utcnow() > url_data["expiry_date"]:
-            return "This short URL has expired.", 410
-        mongo.db.urls.update_one({"short_code": short_code}, {"$inc": {"clicks": 1}})
-        return redirect(url_data["original_url"])
+# Redirect to original URL
+@app.route("/<short_id>")
+def redirect_url(short_id):
+    url_entry = collection.find_one({"short_id": short_id})
+    if url_entry:
+        collection.update_one({"short_id": short_id}, {"$inc": {"clicks": 1}})
+        return redirect(url_entry["original_url"])
     return "URL not found", 404
 
-# Dashboard page UI
-@app.route('/dashboard')
+@app.route("/dashboard")
 def dashboard():
-    return render_template('dashboard.html')
+    data = list(collection.find({}, {"_id": 0}))
+    return render_template("dashboard.html", data=data)
 
-# Dashboard data API
-@app.route('/dashboard/data', methods=['GET'])
-def dashboard_data():
-    urls = mongo.db.urls.find()
-    result = []
-    for url in urls:
-        result.append({
-            "original_url": url.get("original_url", "N/A"),
-            "short_url": request.host_url + url.get("short_code", ""),
-            "clicks": url.get("clicks", 0),
-            "created_at": url.get("created_at", datetime.utcnow()).strftime('%Y-%m-%d %H:%M'),
-            "expiry_date": url.get("expiry_date", datetime.utcnow()).strftime('%Y-%m-%d %H:%M'),
-            "is_expired": datetime.utcnow() > url.get("expiry_date", datetime.utcnow())
-        })
-    return jsonify(result)
 
-# Run locally
-if __name__ == '__main__':
+# Analytics dashboard (JSON response for now)
+@app.route("/analytics", methods=["GET"])
+def analytics():
+    data = list(collection.find({}, {"_id": 0}))
+    return jsonify(data)
+
+if __name__ == "__main__":
     app.run(debug=True)

@@ -2,55 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>URL Dashboard</title>
+    <title>Analytics Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { padding: 10px; border: 1px solid #ccc; }
-        th { background-color: #f2f2f2; }
-        .expired { color: red; }
-        .active { color: green; }
+        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        h1 { text-align: center; }
+        a { color: blue; text-decoration: none; }
     </style>
 </head>
 <body>
-    <h2>Shortened URLs Dashboard</h2>
+    <h1>Analytics Dashboard</h1>
     <table>
-        <thead>
-            <tr>
-                <th>Original URL</th>
-                <th>Short URL</th>
-                <th>Clicks</th>
-                <th>Created At</th>
-                <th>Expiry Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="url-data">
-        </tbody>
+        <tr>
+            <th>Short ID</th>
+            <th>Original URL</th>
+            <th>Clicks</th>
+            <th>Created At</th>
+        </tr>
+        {% for url in data %}
+        <tr>
+            <td><a href="/{{ url.short_id }}" target="_blank">{{ url.short_id }}</a></td>
+            <td><a href="{{ url.original_url }}" target="_blank">{{ url.original_url }}</a></td>
+            <td>{{ url.clicks }}</td>
+            <td>{{ url.created_at }}</td>
+        </tr>
+        {% endfor %}
     </table>
-
-    <script>
-        fetch('/dashboard/data')
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('url-data');
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-
-                    row.innerHTML = `
-                        <td><a href="${item.original_url}" target="_blank">${item.original_url}</a></td>
-                        <td><a href="${item.short_url}" target="_blank">${item.short_url}</a></td>
-                        <td>${item.clicks}</td>
-                        <td>${item.created_at}</td>
-                        <td>${item.expiry_date}</td>
-                        <td class="${item.is_expired ? 'expired' : 'active'}">
-                            ${item.is_expired ? 'Expired' : 'Active'}
-                        </td>
-                    `;
-
-                    tbody.appendChild(row);
-                });
-            });
-    </script>
 </body>
 </html>
