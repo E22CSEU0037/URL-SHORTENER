@@ -57,3 +57,28 @@ cd url-shortener
 
 
 2. Install dependencies"# URL-SHORTENER" 
+
+pip install -r requirements.txt
+
+3. Set up environment
+Create a .env file (or set environment variable) for MongoDB:
+
+MONGO_URI = your_mongodb_atlas_uri
+
+4. Run the app
+
+python main.py
+
+🌐 Deployed URL
+
+Live at: https://your-app-name.onrender.com
+
+👨‍💻 Author
+GEETIKA SINGH
+4th Year BTech CSE | Bennett University
+LinkedIn | GitHub
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
+
