@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from datetime import timedelta
 
 mongo = PyMongo()
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 db = client['url_shortener']
 collection = db['urls']
 
