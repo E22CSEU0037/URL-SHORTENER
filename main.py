@@ -7,7 +7,7 @@ import string, random, datetime, os
 app = Flask(__name__, template_folder=os.path.join('app', 'templates'))
 
 # MongoDB setup
-client = MongoClient("mongodb://localhost:27017/")  # Update if you're using Atlas or Render
+client = MongoClient("mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")  # Update if you're using Atlas or Render
 db = client["url_shortener"]
 collection = db["urls"]
 
