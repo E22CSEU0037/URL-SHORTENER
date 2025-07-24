@@ -1,10 +1,34 @@
 from flask import Flask, jsonify, request, render_template
 from bson.json_util import dumps
 from datetime import datetime
-from app import create_app, collection  # Make sure collection is imported from your app
+from app import create_app, collection 
+# Make sure collection is imported from your app
                                          # or wherever you initialized MongoDB
+from flask import Flask, request, jsonify, redirect, render_template
+from flask_pymongo import PyMongo
+from datetime import datetime, timedelta
+import shortuuid
+
+app = Flask(__name__)
+app.config["MONGO_URI"] = "mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+mongo = PyMongo(app)
+
 
 app = create_app()
+
+@app.route('/dashboard')
+def get_all_urls():
+    all_urls = mongo.db.urls.find()
+    url_list = []
+    for url in all_urls:
+        url_list.append({
+            "original_url": url["original_url"],
+            "short_id": url["short_id"],
+            "created_at": url["created_at"],
+            "clicks": url["clicks"],
+            "expires_at": url["expires_at"]
+        })
+    return render_template("dashboard.html", urls=url_list)
 
 # Route to get all URL data (for dashboard)
 @app.route('/dashboard/data', methods=['GET'])
