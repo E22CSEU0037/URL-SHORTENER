@@ -8,7 +8,7 @@ app = Flask(__name__, template_folder=os.path.join('app', 'templates'))
 
 # MongoDB setup
 client = MongoClient("mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")  # Update if you're using Atlas or Render
-db = client["url_shortener"]
+db = client["urlDB"]
 collection = db["urls"]
 
 # Utility: generate short ID
