@@ -51,29 +51,29 @@ A scalable and production-ready URL shortening service built using **Flask**, **
 
 ### 1. Clone the repo
 
-```bash
+'bash'
 git clone https://github.com/your-username/url-shortener.git
 cd url-shortener
 
 
-2. Install dependencies"# URL-SHORTENER" 
+### 2. Install dependencies"# URL-SHORTENER" 
 
 pip install -r requirements.txt
 
-3. Set up environment
+### 3. Set up environment
 Create a .env file (or set environment variable) for MongoDB:
 
 MONGO_URI = your_mongodb_atlas_uri
 
-4. Run the app
+### 4. Run the app
 
 python main.py
 
-🌐 Deployed URL
+# 🌐 Deployed URL
 
 Live at: https://your-app-name.onrender.com
 
-👨‍💻 Author
+# 👨‍💻 Author
 GEETIKA SINGH
 4th Year BTech CSE | Bennett University
 LinkedIn | GitHub

@@ -13,14 +13,15 @@ def get_all_urls():
     result = []
     for url in urls:
         result.append({
-            "original_url": url["original_url"],
-            "short_url": request.host_url + url["short_code"],
+            "original_url": url.get("original_url", "N/A"),
+            "short_url": request.host_url + url.get("short_code", ""),
             "clicks": url.get("clicks", 0),
-            "created_at": url["created_at"].strftime('%Y-%m-%d %H:%M'),
-            "expiry_date": url["expiry_date"].strftime('%Y-%m-%d %H:%M'),
-            "is_expired": datetime.utcnow() > url["expiry_date"]
+            "created_at": url.get("created_at", datetime.utcnow()).strftime('%Y-%m-%d %H:%M'),
+            "expiry_date": url.get("expiry_date", datetime.utcnow()).strftime('%Y-%m-%d %H:%M'),
+            "is_expired": datetime.utcnow() > url.get("expiry_date", datetime.utcnow())
         })
     return jsonify(result)
+
 
 # Route to serve the dashboard UI
 @app.route('/dashboard')
