@@ -1,59 +1,53 @@
-from flask import Blueprint, request, jsonify, redirect
-from .utils import generate_short_code, is_valid_url
-from app import mongo
+from flask import Blueprint, request, render_template, redirect, url_for
 from datetime import datetime, timedelta
+import shortuuid
+from . import mongo
 
-shortener = Blueprint('shortener', __name__)
+app_routes = Blueprint("app_routes", __name__)
 
-@shortener.route('/', methods=['GET'])
-def home():
-    return jsonify({"message": "URL Shortener is running!"})
+@app_routes.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        original_url = request.form.get('original_url')
+        expiry_days = int(request.form.get("expiry_days", 7))
 
+        short_code = shortuuid.ShortUUID().random(length=6)
+        expiry_date = datetime.utcnow() + timedelta(days=expiry_days)
 
-@shortener.route('/shorten', methods=['POST'])
-def shorten_url():
-    data = request.get_json()
-    original_url = data.get('url')
-    expiry_days = data.get('expiry_days', 30)
+        mongo.db.urls.insert_one({
+            "original_url": original_url,
+            "short_code": short_code,
+            "created_at": datetime.utcnow(),
+            "expiry_date": expiry_date,
+            "clicks": 0
+        })
 
-    if not original_url or not is_valid_url(original_url):
-        return jsonify({'error': 'Invalid URL'}), 400
+        return render_template("index.html", short_url=request.host_url + short_code)
 
-    short_code = generate_short_code()
-    expiry_date = datetime.utcnow() + timedelta(days=expiry_days)
+    return render_template("index.html")
 
-    mongo.db.urls.insert_one({
-        'original_url': original_url,
-        'short_code': short_code,
-        'created_at': datetime.utcnow(),
-        'expiry_date': expiry_date,
-        'clicks': 0
-    })
-
-    return jsonify({'short_url': request.host_url + short_code}), 200
-
-@shortener.route('/<short_code>', methods=['GET'])
+@app_routes.route('/<short_code>')
 def redirect_url(short_code):
-    record = mongo.db.urls.find_one({'short_code': short_code})
-    if not record:
-        return jsonify({'error': 'Invalid short code'}), 404
+    url_data = mongo.db.urls.find_one({"short_code": short_code})
+    if url_data:
+        if datetime.utcnow() < url_data["expiry_date"]:
+            mongo.db.urls.update_one({"short_code": short_code}, {"$inc": {"clicks": 1}})
+            return redirect(url_data["original_url"])
+        else:
+            return "Link expired"
+    return "Invalid URL"
 
-    if record['expiry_date'] < datetime.utcnow():
-        return jsonify({'error': 'Link expired'}), 410
-
-    mongo.db.urls.update_one({'short_code': short_code}, {'$inc': {'clicks': 1}})
-    return redirect(record['original_url'])
-
-@shortener.route('/analytics/<short_code>', methods=['GET'])
-def analytics(short_code):
-    record = mongo.db.urls.find_one({'short_code': short_code})
-    if not record:
-        return jsonify({'error': 'Invalid short code'}), 404
-
-    return jsonify({
-        'original_url': record['original_url'],
-        'short_code': short_code,
-        'clicks': record['clicks'],
-        'expiry_date': record['expiry_date'],
-        'created_at': record['created_at']
-    })
+@app_routes.route('/dashboard')
+def dashboard():
+    urls = mongo.db.urls.find()
+    url_list = []
+    for url in urls:
+        url_list.append({
+            "original_url": url.get("original_url"),
+            "short_code": url.get("short_code"),
+            "clicks": url.get("clicks", 0),
+            "created_at": url.get("created_at").strftime("%Y-%m-%d %H:%M"),
+            "expiry_date": url.get("expiry_date").strftime("%Y-%m-%d %H:%M"),
+            "expired": datetime.utcnow() > url.get("expiry_date")
+        })
+    return render_template("dashboard.html", urls=url_list)

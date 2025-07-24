@@ -1,23 +1,18 @@
 from flask import Flask
 from flask_pymongo import PyMongo
-from pymongo import MongoClient
 from datetime import timedelta
+from .routes import app_routes
 
 mongo = PyMongo()
-client = MongoClient('mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
-db = client['url_shortener']
-collection = db['urls']
 
 def create_app():
     app = Flask(__name__)
-    
-    # MongoDB config
-    app.config["MONGO_URI"] = "mongodb://localhost:27017/url_shortener"
-    
+    app.config["MONGO_URI"] = "mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    app.secret_key = "your-secret-key"
+    app.permanent_session_lifetime = timedelta(days=5)
+
     mongo.init_app(app)
 
-    # Register routes
-    from .routes import shortener
-    app.register_blueprint(shortener)
+    app.register_blueprint(app_routes)
 
     return app

@@ -1,33 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Analytics Dashboard</title>
-    <style>
-        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        h1 { text-align: center; }
-        a { color: blue; text-decoration: none; }
-    </style>
-</head>
+<html>
+<head><title>Dashboard</title></head>
 <body>
-    <h1>Analytics Dashboard</h1>
-    <table>
-        <tr>
-            <th>Short ID</th>
-            <th>Original URL</th>
-            <th>Clicks</th>
-            <th>Created At</th>
-        </tr>
-        {% for url in data %}
-        <tr>
-            <td><a href="/{{ url.short_id }}" target="_blank">{{ url.short_id }}</a></td>
-            <td><a href="{{ url.original_url }}" target="_blank">{{ url.original_url }}</a></td>
-            <td>{{ url.clicks }}</td>
-            <td>{{ url.created_at }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+  <h2>Dashboard</h2>
+  <table border="1">
+    <tr>
+      <th>Original URL</th>
+      <th>Short Code</th>
+      <th>Clicks</th>
+      <th>Created At</th>
+      <th>Expiry Date</th>
+      <th>Status</th>
+    </tr>
+    {% for url in urls %}
+      <tr>
+        <td>{{ url.original_url }}</td>
+        <td>{{ url.short_code }}</td>
+        <td>{{ url.clicks }}</td>
+        <td>{{ url.created_at }}</td>
+        <td>{{ url.expiry_date }}</td>
+        <td>{{ 'Expired' if url.expired else 'Active' }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+  <a href="/">Back to Shortener</a>
 </body>
 </html>
