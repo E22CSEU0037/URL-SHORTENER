@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for
 from datetime import datetime, timedelta
 import shortuuid
-from . import mongo
+from . import mongo  # ✅ This now works because __init__.py has already initialized mongo
 
 app_routes = Blueprint("app_routes", __name__)
 

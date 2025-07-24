@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_pymongo import PyMongo
 from datetime import timedelta
-from .routes import app_routes
 
 mongo = PyMongo()
 
@@ -13,6 +12,8 @@ def create_app():
 
     mongo.init_app(app)
 
+    # 🔁 Import after initializing app and mongo
+    from .routes import app_routes
     app.register_blueprint(app_routes)
 
     return app
