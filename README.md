@@ -52,8 +52,8 @@ A scalable and production-ready URL shortening service built using **Flask**, **
 
 ### 1. Clone the repo
 
-'bash'
 git clone https://github.com/E22CSEU0037/URL-SHORTENER.git
+
 cd url-shortener
 
 
@@ -77,6 +77,8 @@ Live at: https://url-shortener-r7mj.onrender.com
 # 👨‍💻 Author
 GEETIKA SINGH
 4th Year BTech CSE | Bennett University
+
+
 [LinkedIn](https://www.linkedin.com/in/geetikasingh-e22cseu0037/) | [GitHub](https://github.com/E22CSEU0037)
 
 ## 📄 License
