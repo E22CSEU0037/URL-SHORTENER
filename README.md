@@ -36,6 +36,7 @@ A scalable and production-ready URL shortening service built using **Flask**, **
 | `POST` | `/shorten` | Shorten a long URL |
 | `GET`  | `/<short_code>` | Redirect to original URL |
 | `GET`  | `/dashboard/data` | Get all URLs with analytics |
+| `GET`  | `/dashboard/`   | Get the dashboard UI |
 
 ---
 
@@ -52,7 +53,7 @@ A scalable and production-ready URL shortening service built using **Flask**, **
 ### 1. Clone the repo
 
 'bash'
-git clone https://github.com/your-username/url-shortener.git
+git clone https://github.com/E22CSEU0037/URL-SHORTENER.git
 cd url-shortener
 
 
@@ -71,12 +72,12 @@ python main.py
 
 # 🌐 Deployed URL
 
-Live at: https://your-app-name.onrender.com
+Live at: https://url-shortener-r7mj.onrender.com
 
 # 👨‍💻 Author
 GEETIKA SINGH
 4th Year BTech CSE | Bennett University
-LinkedIn | GitHub
+[LinkedIn](https://www.linkedin.com/in/geetikasingh-e22cseu0037/) | [GitHub](https://github.com/E22CSEU0037)
 
 ## 📄 License
 
