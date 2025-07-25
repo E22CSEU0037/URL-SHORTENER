@@ -1,5 +1,3 @@
-Flask==2.3.2
-Flask-PyMongo==2.3.0
-dnspython
-shortuuid
-gunicorn
+Flask
+Flask-PyMongo
+python-dotenv

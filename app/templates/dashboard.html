@@ -1,28 +1,89 @@
 <!DOCTYPE html>
 <html>
-<head><title>Dashboard</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Shortened URLs Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1 {
+            color: #222;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            color: blue;
+            text-decoration: none;
+        }
+
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-expired {
+            color: red;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+
+    <script>
+        async function fetchData() {
+            const res = await fetch('/dashboard/data');
+            const data = await res.json();
+
+            const table = document.getElementById("urlTable");
+            data.forEach((url, index) => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td><a href="${url.original_url || '#'}" target="_blank">${url.original_url || 'N/A'}</a></td>
+                    <td><a href="${url.short_url}" target="_blank">${url.short_url}</a></td>
+                    <td>${url.clicks}</td>
+                    <td>${url.created_at}</td>
+                    <td>${url.expiry_date}</td>
+                    <td class="${url.is_expired ? 'status-expired' : 'status-active'}">
+                        ${url.is_expired ? 'Expired' : 'Active'}
+                    </td>
+                `;
+            });
+        }
+        window.onload = fetchData;
+    </script>
+</head>
 <body>
-  <h2>Dashboard</h2>
-  <table border="1">
-    <tr>
-      <th>Original URL</th>
-      <th>Short Code</th>
-      <th>Clicks</th>
-      <th>Created At</th>
-      <th>Expiry Date</th>
-      <th>Status</th>
-    </tr>
-    {% for url in urls %}
-      <tr>
-        <td>{{ url.original_url }}</td>
-        <td>{{ url.short_code }}</td>
-        <td>{{ url.clicks }}</td>
-        <td>{{ url.created_at }}</td>
-        <td>{{ url.expiry_date }}</td>
-        <td>{{ 'Expired' if url.expired else 'Active' }}</td>
-      </tr>
-    {% endfor %}
-  </table>
-  <a href="/">Back to Shortener</a>
+    <h1>Shortened URLs Dashboard</h1>
+    <table id="urlTable">
+        <tr>
+            <th>Original URL</th>
+            <th>Short URL</th>
+            <th>Clicks</th>
+            <th>Created At</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+        </tr>
+    </table>
 </body>
 </html>

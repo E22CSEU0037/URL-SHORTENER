@@ -1,19 +1,17 @@
 from flask import Flask
-from flask_pymongo import PyMongo
+from pymongo import MongoClient
 from datetime import timedelta
-
-mongo = PyMongo()
 
 def create_app():
     app = Flask(__name__)
-    app.config["MONGO_URI"] = "mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    app.secret_key = "your-secret-key"
+    app.config['SECRET_KEY'] = 'your_secret_key'
     app.permanent_session_lifetime = timedelta(days=5)
 
-    mongo.init_app(app)
+    # Setup MongoDB
+    client = MongoClient("mongodb+srv://geetika:1234@cluster0.t02dpec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    db = client["urlDB"]
 
-    # 🔁 Import after initializing app and mongo
-    from .routes import app_routes
-    app.register_blueprint(app_routes)
+    # Store DB reference in app
+    app.db = db
 
     return app
